@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+db.sqlite3
+staticfiles/
+staticfiles.W004
+media/
+.gemini/
+*.log
+test_view.py
