@@ -1,0 +1,147 @@
+{% extends 'bookings/base.html' %}
+
+{% block title %}Билет забронирован! — AuraCinema{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Printing styles */
+    @media print {
+        header, footer, .btn-secondary, .success-icon, .success-desc {
+            display: none !important;
+        }
+        body {
+            background: #white !important;
+            color: #000 !important;
+        }
+        .container {
+            width: 100% !important;
+            max-width: 100% !important;
+            padding: 0 !important;
+        }
+        .ticket-card {
+            box-shadow: none !important;
+            border: 1px solid #ccc !important;
+            background: #fff !important;
+            color: #000 !important;
+            page-break-inside: avoid;
+            margin: 0 auto;
+        }
+        .ticket-main {
+            border-right: 1px dashed #ccc !important;
+        }
+        .ticket-stub {
+            background: #fafafa !important;
+        }
+        .ticket-movie-title {
+            color: #000 !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="ticket-success-wrapper">
+    <!-- Success Badge -->
+    <div class="success-icon">
+        <i class="fa-solid fa-circle-check"></i>
+    </div>
+    <h1 class="success-title">Места успешно забронированы!</h1>
+    <p class="success-desc">
+        Благодарим за покупку! Информация о бронировании отправлена на указанную почту <strong>{{ booking.customer_email }}</strong>. Назовите номер бронирования или предъявите QR-код при входе.
+    </p>
+
+    <!-- Ticket Card UI -->
+    <div class="ticket-card">
+        <!-- Main ticket details -->
+        <div class="ticket-main">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+                <div>
+                    <span style="font-size: 11px; text-transform: uppercase; color: var(--color-std); font-weight: 700; letter-spacing: 2px;">
+                        ВХОДНОЙ БИЛЕТ
+                    </span>
+                    <h2 class="ticket-movie-title">{{ booking.session.movie.title }}</h2>
+                </div>
+                <div style="text-align: right;">
+                    <span style="font-size: 11px; color: var(--color-muted); display: block;">ЗАЛ</span>
+                    <span style="font-size: 20px; font-weight: 800; color: #fff; font-family: var(--font-header);">
+                        {{ booking.session.hall.name }}
+                    </span>
+                </div>
+            </div>
+            
+            <div class="ticket-info-grid">
+                <div class="ticket-info-item">
+                    <div class="ticket-info-label">ДАТА И ВРЕМЯ</div>
+                    <div class="ticket-info-val">{{ booking.session.start_time|date:"d E Y" }} в {{ booking.session.start_time|date:"H:i" }}</div>
+                </div>
+                <div class="ticket-info-item">
+                    <div class="ticket-info-label">ТИП ЭКРАНА</div>
+                    <div class="ticket-info-val">{{ booking.session.hall.screen_type }}</div>
+                </div>
+                <div class="ticket-info-item" style="grid-column: span 2; border-top: 1px solid var(--border-color); padding-top: 15px; margin-top: 5px;">
+                    <div class="ticket-info-label">ВЫБРАННЫЕ МЕСТА</div>
+                    <div class="ticket-info-val" style="color: var(--color-selected); font-size: 18px; font-weight: 700;">
+                        {% for ticket in tickets %}
+                            Ряд {{ ticket.seat.row }} место {{ ticket.seat.number }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="ticket-info-item" style="border-top: 1px solid var(--border-color); padding-top: 15px;">
+                    <div class="ticket-info-label">ФИО ЗРИТЕЛЯ</div>
+                    <div class="ticket-info-val">{{ booking.customer_name }}</div>
+                </div>
+                <div class="ticket-info-item" style="border-top: 1px solid var(--border-color); padding-top: 15px;">
+                    <div class="ticket-info-label">СТОИМОСТЬ</div>
+                    <div class="ticket-info-val">{{ booking.total_price|floatformat:0 }} ₽</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Ticket Stub (for control) -->
+        <div class="ticket-stub">
+            <div class="ticket-qr-mock">
+                <!-- Visual SVG generating a nice QR code grid pattern -->
+                <svg width="90" height="90" viewBox="0 0 100 100" style="display: block;">
+                    <!-- Quiet zone and outer squares -->
+                    <rect width="100" height="100" fill="white" />
+                    <!-- Visual mock of QR code codeblocks -->
+                    <rect x="10" y="10" width="25" height="25" fill="black" />
+                    <rect x="15" y="15" width="15" height="15" fill="white" />
+                    <rect x="18" y="18" width="9" height="9" fill="black" />
+                    
+                    <rect x="65" y="10" width="25" height="25" fill="black" />
+                    <rect x="70" y="15" width="15" height="15" fill="white" />
+                    <rect x="73" y="18" width="9" height="9" fill="black" />
+                    
+                    <rect x="10" y="65" width="25" height="25" fill="black" />
+                    <rect x="15" y="70" width="15" height="15" fill="white" />
+                    <rect x="18" y="73" width="9" height="9" fill="black" />
+                    
+                    <!-- Random grids -->
+                    <rect x="42" y="15" width="8" height="18" fill="black" />
+                    <rect x="52" y="10" width="8" height="8" fill="black" />
+                    <rect x="45" y="40" width="15" height="15" fill="black" />
+                    <rect x="15" y="45" width="10" height="8" fill="black" />
+                    <rect x="75" y="45" width="15" height="8" fill="black" />
+                    <rect x="65" y="55" width="8" height="20" fill="black" />
+                    <rect x="42" y="65" width="16" height="8" fill="black" />
+                    <rect x="50" y="78" width="25" height="12" fill="black" />
+                    <rect x="80" y="68" width="10" height="15" fill="black" />
+                </svg>
+            </div>
+            <div style="font-size: 10px; color: var(--color-muted); margin-bottom: 2px;">БРОНЬ №</div>
+            <div class="ticket-id">{{ booking.id|stringformat:"06d" }}</div>
+        </div>
+    </div>
+    
+    <!-- Action buttons -->
+    <div style="margin-top: 40px; display: flex; gap: 15px;">
+        <button onclick="window.print()" class="btn btn-primary">
+            <i class="fa-solid fa-print"></i> Распечатать билет
+        </button>
+        <a href="{% url 'bookings:index' %}" class="btn btn-secondary">
+            <i class="fa-solid fa-house"></i> На главную
+        </a>
+    </div>
+</section>
+{% endblock %}

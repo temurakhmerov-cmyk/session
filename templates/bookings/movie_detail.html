@@ -1,0 +1,73 @@
+{% extends 'bookings/base.html' %}
+
+{% block title %}{{ movie.title }} — AuraCinema{% endblock %}
+
+{% block content %}
+
+<section class="movie-detail-container">
+    <!-- Movie Poster -->
+    <div class="movie-detail-poster" style="background-image: url('{{ movie.poster }}');"></div>
+    
+    <!-- Movie Info -->
+    <div class="movie-detail-info">
+        <h1>{{ movie.title }}</h1>
+        
+        <div class="movie-detail-badges">
+            <span class="detail-badge detail-rating">
+                <i class="fa-solid fa-star"></i> {{ movie.rating }}
+            </span>
+            <span class="detail-badge">
+                <i class="fa-solid fa-tags"></i> {{ movie.genre }}
+            </span>
+            <span class="detail-badge">
+                <i class="fa-regular fa-clock"></i> {{ movie.duration }} минут
+            </span>
+            <span class="detail-badge">
+                Дата премьеры: {{ movie.release_date|date:"d E Y" }}
+            </span>
+        </div>
+        
+        <p class="movie-detail-desc">{{ movie.description }}</p>
+        
+        <div class="glass-panel" style="padding: 20px 25px; margin-bottom: 30px;">
+            <div class="movie-meta-item">
+                <span class="movie-meta-label">Режиссёр:</span>
+                <span>{{ movie.director|default:"Не указан" }}</span>
+            </div>
+            <div class="movie-meta-item">
+                <span class="movie-meta-label">Формат:</span>
+                <span>2D, 3D, IMAX 3D</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Sessions Schedule -->
+<section class="sessions-section">
+    <h2 class="section-title">Расписание сеансов</h2>
+    
+    {% if sessions_by_date %}
+        {% for day in sessions_by_date %}
+        <div class="date-group">
+            <h3 class="date-title">
+                <i class="fa-regular fa-calendar-days"></i> {{ day.date|date:"d E, l" }}
+            </h3>
+            <div class="sessions-grid">
+                {% for session in day.sessions %}
+                <a href="{% url 'bookings:booking' session.id %}" class="session-card">
+                    <div class="session-time">{{ session.start_time|date:"H:i" }}</div>
+                    <div class="session-hall">{{ session.hall.name }} ({{ session.hall.screen_type }})</div>
+                    <div class="session-price">{{ session.base_price|floatformat:0 }} ₽</div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="glass-panel" style="text-align: center; padding: 40px;">
+            <p style="color: var(--color-muted); font-style: italic;">На этот фильм пока нет запланированных сеансов.</p>
+        </div>
+    {% endif %}
+</section>
+
+{% endblock %}

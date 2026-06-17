@@ -1,0 +1,43 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AuraCinema — Бронирование билетов{% endblock %}</title>
+    <!-- CSS Stylesheet -->
+    <link rel="stylesheet" href="{% static 'bookings/css/styles.css' %}?v=3">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-content">
+            <a href="{% url 'bookings:index' %}" class="logo">
+                <i class="fa-solid fa-film"></i> AuraCinema
+            </a>
+            <nav class="nav-links">
+                <a href="{% url 'bookings:index' %}" class="nav-link">
+                    <i class="fa-solid fa-clapperboard"></i> Афиша
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p><i class="fa-solid fa-ticket"></i> &copy; 2026 AuraCinema. Система бронирования билетов в кино. Все права защищены.</p>
+        </div>
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

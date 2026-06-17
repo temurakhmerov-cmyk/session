@@ -1,0 +1,61 @@
+{% extends 'bookings/base.html' %}
+
+{% block title %}Афиша — AuraCinema{% endblock %}
+
+{% block content %}
+
+<!-- Hero Banner (Featured Movie) -->
+{% if featured_movie %}
+<section class="hero">
+    <div class="hero-banner" style="background-image: url('{{ featured_movie.banner }}');"></div>
+    <div class="hero-content">
+        <span class="hero-tag">Рекомендуем</span>
+        <h1 class="hero-title">{{ featured_movie.title }}</h1>
+        <p class="hero-desc">{{ featured_movie.description }}</p>
+        <div class="hero-buttons">
+            <a href="{% url 'bookings:movie_detail' featured_movie.id %}" class="btn btn-primary">
+                <i class="fa-solid fa-calendar-check"></i> Купить билет
+            </a>
+            <a href="{% url 'bookings:movie_detail' featured_movie.id %}" class="btn btn-secondary">
+                <i class="fa-solid fa-circle-info"></i> О фильме
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Catalog Grid -->
+<section>
+    <h2 class="section-title">Сегодня в кино</h2>
+    
+    <div class="movie-grid">
+        {% for movie in movies %}
+        <article class="movie-card">
+            <div class="movie-card-poster" style="background-image: url('{{ movie.poster }}');">
+                <div class="movie-rating-badge">
+                    <i class="fa-solid fa-star"></i> {{ movie.rating }}
+                </div>
+            </div>
+            <div class="movie-card-info">
+                <div>
+                    <h3 class="movie-card-title">{{ movie.title }}</h3>
+                    <div class="movie-card-meta">
+                        <span>{{ movie.genre }}</span>
+                        <span><i class="fa-regular fa-clock"></i> {{ movie.duration }} мин</span>
+                    </div>
+                </div>
+                <a href="{% url 'bookings:movie_detail' movie.id %}" class="btn btn-secondary" style="width: 100%; text-align: center;">
+                    <i class="fa-solid fa-ticket"></i> Выбрать сеанс
+                </a>
+            </div>
+        </article>
+        {% empty %}
+        <div class="glass-panel" style="grid-column: 1 / -1; text-align: center; padding: 50px;">
+            <h3><i class="fa-solid fa-circle-exclamation" style="font-size: 40px; color: var(--color-muted); margin-bottom: 15px;"></i></h3>
+            <p style="color: var(--color-muted);">В данный момент нет доступных фильмов в прокате.</p>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+{% endblock %}
