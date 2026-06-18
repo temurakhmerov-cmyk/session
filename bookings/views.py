@@ -175,3 +175,24 @@ def api_create_booking(request):
         return JsonResponse({'error': 'Неверный формат JSON'}, status=400)
     except Exception as e:
         return JsonResponse({'error': f'Произошла системная ошибка: {str(e)}'}, status=500)
+
+
+from django.db.models import Q
+
+def history_view(request):
+    query = request.GET.get('query', '').strip()
+    bookings = []
+    searched = False
+    
+    if query:
+        searched = True
+        bookings = Booking.objects.filter(
+            Q(customer_email__iexact=query) | Q(customer_phone=query)
+        ).order_by('-created_at').prefetch_related('tickets__seat', 'session__movie', 'session__hall')
+        
+    context = {
+        'query': query,
+        'bookings': bookings,
+        'searched': searched,
+    }
+    return render(request, 'bookings/history.html', context)

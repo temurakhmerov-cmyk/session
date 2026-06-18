@@ -1,0 +1,284 @@
+{% extends 'bookings/base.html' %}
+
+{% block title %}История покупок — AuraCinema{% endblock %}
+
+{% block extra_head %}
+<style>
+    .history-container {
+        max-width: 800px;
+        margin: 40px auto 60px auto;
+    }
+    .history-header {
+        text-align: center;
+        margin-bottom: 35px;
+    }
+    .history-title {
+        font-family: var(--font-header);
+        font-size: 36px;
+        font-weight: 800;
+        margin-bottom: 10px;
+        background: linear-gradient(135deg, #00f0ff 0%, #b026ff 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .history-subtitle {
+        color: var(--color-muted);
+        font-size: 15px;
+    }
+    .search-panel {
+        margin-bottom: 40px;
+    }
+    .search-form {
+        display: flex;
+        gap: 15px;
+    }
+    .search-input-wrapper {
+        flex-grow: 1;
+        position: relative;
+    }
+    .search-input-wrapper i {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--color-muted);
+        font-size: 16px;
+    }
+    .search-input-wrapper .form-control {
+        padding-left: 45px;
+        height: 50px;
+        font-size: 15px;
+        border-radius: 25px;
+    }
+    .search-btn {
+        height: 50px;
+        padding: 0 30px;
+        border-radius: 25px;
+    }
+    .bookings-list {
+        display: grid;
+        gap: 24px;
+    }
+    .booking-history-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 25px;
+        transition: all 0.3s ease;
+    }
+    .booking-history-card:hover {
+        border-color: rgba(138, 43, 226, 0.3);
+        box-shadow: 0 8px 25px rgba(138, 43, 226, 0.1);
+        transform: translateY(-2px);
+    }
+    .booking-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 15px;
+        margin-bottom: 20px;
+    }
+    .booking-ref {
+        font-family: var(--font-header);
+        font-size: 18px;
+        font-weight: 700;
+        color: #fff;
+    }
+    .booking-date {
+        font-size: 12px;
+        color: var(--color-muted);
+    }
+    .booking-card-body {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 20px;
+    }
+    .booking-movie-poster {
+        width: 80px;
+        height: 120px;
+        background-size: cover;
+        background-position: center;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+    }
+    .booking-info {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    .booking-movie-title {
+        font-family: var(--font-header);
+        font-size: 20px;
+        font-weight: 800;
+        color: #fff;
+        margin-bottom: 8px;
+    }
+    .booking-detail-row {
+        font-size: 14px;
+        color: var(--color-muted);
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-bottom: 12px;
+    }
+    .booking-detail-row span {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .booking-detail-row span strong {
+        color: #fff;
+    }
+    .booking-seats-list {
+        font-size: 14px;
+        margin-top: 5px;
+    }
+    .booking-seats-list strong {
+        color: var(--color-selected);
+    }
+    .booking-card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid var(--border-color);
+        padding-top: 15px;
+        margin-top: 20px;
+    }
+    .booking-total-price {
+        font-size: 15px;
+        color: var(--color-muted);
+    }
+    .booking-total-price strong {
+        font-family: var(--font-header);
+        font-size: 20px;
+        font-weight: 800;
+        color: var(--color-selected);
+    }
+    .empty-history-state {
+        text-align: center;
+        padding: 60px 40px;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+    }
+    .empty-icon {
+        font-size: 48px;
+        color: var(--color-muted);
+        margin-bottom: 20px;
+        opacity: 0.7;
+    }
+    .empty-title {
+        font-family: var(--font-header);
+        font-size: 22px;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+    .empty-desc {
+        color: var(--color-muted);
+        font-size: 14px;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    @media (max-width: 600px) {
+        .search-form {
+            flex-direction: column;
+        }
+        .booking-card-body {
+            grid-template-columns: 1fr;
+        }
+        .booking-movie-poster {
+            display: none;
+        }
+        .booking-card-footer {
+            flex-direction: column;
+            gap: 15px;
+            align-items: flex-start;
+        }
+        .booking-card-footer .btn {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="history-container">
+    <div class="history-header">
+        <h1 class="history-title">История покупок</h1>
+        <p class="history-subtitle">Найдите ваши билеты по Email или номеру телефона</p>
+    </div>
+
+    <!-- Search Form -->
+    <div class="glass-panel search-panel">
+        <form method="GET" action="{% url 'bookings:history' %}" class="search-form">
+            <div class="search-input-wrapper">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" name="query" class="form-control" placeholder="Например: ivan@example.com или +79998887766" value="{{ query }}" required>
+            </div>
+            <button type="submit" class="btn btn-primary search-btn">
+                <i class="fa-solid fa-search"></i> Найти билеты
+            </button>
+        </form>
+    </div>
+
+    <!-- Results Area -->
+    {% if searched %}
+        {% if bookings %}
+            <div class="bookings-list">
+                {% for booking in bookings %}
+                    <div class="booking-history-card">
+                        <div class="booking-card-header">
+                            <span class="booking-ref">Бронь №{{ booking.id|stringformat:"06d" }}</span>
+                            <span class="booking-date">Оформлено: {{ booking.created_at|date:"d.m.Y H:i" }}</span>
+                        </div>
+                        <div class="booking-card-body">
+                            <div class="booking-movie-poster" style="background-image: url('{{ booking.session.movie.poster }}');"></div>
+                            <div class="booking-info">
+                                <div>
+                                    <h3 class="booking-movie-title">{{ booking.session.movie.title }}</h3>
+                                    <div class="booking-detail-row">
+                                        <span><i class="fa-regular fa-calendar-days"></i> {{ booking.session.start_time|date:"d E Y" }}</span>
+                                        <span><i class="fa-regular fa-clock"></i> {{ booking.session.start_time|date:"H:i" }}</span>
+                                        <span><i class="fa-solid fa-video"></i> {{ booking.session.hall.name }}</span>
+                                    </div>
+                                    <div class="booking-seats-list">
+                                        <i class="fa-solid fa-ticket"></i> Места: 
+                                        <strong>
+                                            {% for ticket in booking.tickets.all %}
+                                                Ряд {{ ticket.seat.row }} место {{ ticket.seat.number }}{% if not forloop.last %}, {% endif %}
+                                            {% endfor %}
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="booking-card-footer">
+                            <div class="booking-total-price">
+                                Стоимость заказа: <strong>{{ booking.total_price|floatformat:0 }} ₽</strong>
+                            </div>
+                            <a href="{% url 'bookings:ticket_confirmation' booking.id %}" class="btn btn-secondary">
+                                <i class="fa-solid fa-eye"></i> Показать билет
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-history-state">
+                <div class="empty-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <h3 class="empty-title">Заказы не найдены</h3>
+                <p class="empty-desc">По запросу «<strong>{{ query }}</strong>» не найдено ни одного подтвержденного бронирования. Проверьте правильность ввода.</p>
+            </div>
+        {% endif %}
+    {% else %}
+        <!-- Initial view -->
+        <div class="empty-history-state">
+            <div class="empty-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+            <h3 class="empty-title">Просмотр истории заказов</h3>
+            <p class="empty-desc">Введите ваш Email-адрес или номер мобильного телефона, которые вы указывали при оформлении билетов, чтобы увидеть всю историю ваших покупок.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

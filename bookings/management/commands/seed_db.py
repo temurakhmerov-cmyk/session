@@ -1,5 +1,7 @@
 import os
+# pyrefly: ignore [missing-import]
 from django.core.management.base import BaseCommand
+# pyrefly: ignore [missing-import]
 from django.utils import timezone
 from bookings.models import Movie, Hall, Session, Seat, Booking, Ticket
 
